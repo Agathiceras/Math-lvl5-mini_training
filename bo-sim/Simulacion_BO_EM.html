@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+<script>
+/* Language: ?lang=xx loads assets/content-xx.js (falls back to English) */
+(function(){ var m = /[?&]lang=([a-z]{2}(?:-[A-Za-z]{2})?)/.exec(location.search); window.LANG = m ? m[1] : 'en';
+  document.write('<script src="assets/content-' + LANG + '.js"><\/script>'); })();
+</script>
+<script>if (!window.CONTENT){
+  /* The requested language file is missing or has an error: show English, and say so (useful while checking a translation) */
+  if (LANG !== 'en') document.addEventListener('DOMContentLoaded', function(){ var b = document.createElement('div');
+    b.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99999;background:#E5484D;color:#fff;font:600 14px/1.4 system-ui,sans-serif;padding:10px 16px;text-align:center';
+    b.textContent = '⚠ assets/content-' + LANG + '.js could not be loaded (missing file or an error inside it). Showing English instead.'; document.body.appendChild(b); });
+  window.LANG = 'en'; document.write('<script src="assets/content-en.js"><\/script>'); }</script>
+<style>
+:root{
+  --bg:#211E33; --sidebar:#1B1830; --card:#2C2846; --card2:#342E56; --card3:#3A3460;
+  --border:rgba(255,255,255,.07); --border2:rgba(255,255,255,.12);
+  --text:#EDEAF9; --text2:#C3BEDA; --muted:#8B85A6;
+  --accent:#7B87F5; --accent-d:#6067D8; --accent-bg:rgba(123,135,245,.15);
+  --green:#34D399; --green-bg:rgba(52,211,153,.15);
+  --orange:#F2A93B; --orange-bg:rgba(242,169,59,.18);
+  --red:#F2716D; --red-bg:rgba(242,113,109,.15); --grey-bg:#413A66; --grey-t:#B4AFC9;
+  --r:14px; --rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Inter,system-ui,sans-serif;min-height:100vh;font-size:14px}
+button{font-family:inherit;cursor:pointer}
+a{color:#8FA0F5;text-decoration:none;cursor:pointer}
+a:hover{text-decoration:underline}
+select,input{font-family:inherit}
+.app{display:flex;min-height:100vh}
+.sidebar{width:72px;background:var(--sidebar);display:flex;flex-direction:column;align-items:center;padding:20px 0;flex-shrink:0;border-right:1px solid var(--border);position:sticky;top:0;height:100vh}
+.side-logo{font-size:24px;font-weight:800;color:var(--accent);margin-bottom:28px;letter-spacing:-1px}
+.side-icon{width:44px;height:44px;border-radius:12px;background:transparent;border:none;color:var(--muted);display:flex;align-items:center;justify-content:center;margin-bottom:10px;transition:all .15s;position:relative}
+.side-icon:hover{background:var(--card2);color:var(--text)}
+.side-icon.active{background:var(--accent);color:#fff}
+.tour-hl{box-shadow:0 0 0 3px #FFD166 !important;animation:pulse 1.4s infinite;position:relative;z-index:30}
+.tour-hl::after{content:'';position:absolute;inset:-5px;border-radius:16px;border:2px solid #FFD166;box-shadow:0 0 0 4px rgba(255,209,102,.25);animation:pulse 1.4s infinite;pointer-events:none}
+.side-bottom{margin-top:auto}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--border)}
+.sim-badge{background:var(--orange-bg);color:var(--orange);font-weight:700;font-size:12px;padding:6px 14px;border-radius:999px;border:1px solid rgba(242,169,59,.35)}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.tourbtn{background:#FFD166;color:#2a2205;border:none;border-radius:999px;padding:9px 16px;font-weight:800;font-size:12.5px}
+.ticon{width:36px;height:36px;border-radius:10px;background:transparent;border:none;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.ticon:hover{background:var(--card2);color:var(--text)}
+.langwrap{position:relative}
+.langmenu{display:none;position:absolute;top:44px;right:0;background:#fff;color:#2a2540;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:200;overflow:hidden;min-width:140px}
+.langmenu.open{display:block}
+.langmenu button{display:block;width:100%;text-align:left;padding:10px 16px;background:none;border:none;font-size:13.5px;font-weight:600;color:#2a2540}
+.langmenu button:hover{background:#f0f0f5}
+.langmenu button.active{color:var(--accent-d);font-weight:800}
+.content{flex:1;padding:26px 32px 90px;overflow-x:hidden}
+h1.pagetitle{font-size:26px;font-weight:700;margin-bottom:18px}
+.row3{display:grid;grid-template-columns:1.1fr 1.3fr 1fr;gap:16px;margin-bottom:18px}
+@media(max-width:980px){.row3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.card h3{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
+.profile-name{font-size:19px;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.field{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13.5px;color:var(--text2);border-bottom:1px solid var(--border)}
+.field:last-child{border-bottom:none}
+.field .ic{color:var(--muted);flex-shrink:0}
+.course-item{padding:12px 14px;background:var(--card2);border-radius:10px;margin-bottom:10px;font-size:13.5px;color:var(--text2)}
+.course-item:last-child{margin-bottom:0}
+.availrow{display:flex;justify-content:space-between;padding:6px 0;font-size:13.5px}
+.availrow .day{color:var(--text2)}
+.availrow .val{color:var(--muted);font-style:italic}
+.availrow .val.set{background:var(--accent-bg);color:#AEB8FA;font-style:normal;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.tabrow{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:9px 18px;background:var(--card);border:1px solid var(--border2);color:var(--text2);font-weight:700;font-size:13px;border-radius:8px}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tab.ghost{opacity:.55;cursor:default}
+.tablewrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;overflow-x:auto;position:relative}
+table{width:100%;border-collapse:collapse}
+thead th{text-align:left;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:12px 16px;background:var(--card2);white-space:nowrap}
+tbody td{padding:13px 16px;font-size:13.5px;color:var(--text2);border-top:1px solid var(--border);vertical-align:top;white-space:nowrap}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+.pill{display:inline-block;padding:3px 12px;border-radius:999px;font-size:11.5px;font-weight:700}
+.pill-green{background:var(--green-bg);color:var(--green)}
+.pill-blue{background:var(--accent-bg);color:#AEB8FA}
+.pill-grey{background:var(--grey-bg);color:var(--grey-t)}
+.pill-orange{background:var(--orange-bg);color:var(--orange)}
+.tbl-foot{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 18px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.empty-row td{text-align:center;color:var(--muted);padding:26px;font-style:italic;white-space:normal}
+.iconbtn{width:36px;height:36px;border-radius:10px;background:var(--card2);border:1px solid var(--border2);color:var(--text2);display:flex;align-items:center;justify-content:center}
+.iconbtn:hover{background:var(--card3);color:var(--text)}
+.icontip{position:relative;display:inline-flex}
+.icontip .bubble{
+  display:none;position:absolute;top:44px;right:0;background:#fff;color:#2a2540;border-radius:8px;
+  padding:8px 12px;font-size:12.5px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.4);white-space:nowrap;z-index:80;
+}
+.icontip .bubble:before{content:'';position:absolute;top:-5px;right:14px;width:10px;height:10px;background:#fff;transform:rotate(45deg)}
+.icontip:hover .bubble{display:block}
+.icontip.tour-hl .bubble{display:block}
+.btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent-d)}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.detailhead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:18px;flex-wrap:wrap}
+.detailhead h2{font-size:19px;font-weight:700;display:flex;align-items:center;gap:8px}
+.detailhead-actions{display:flex;gap:8px;align-items:center}
+.backlink{display:inline-flex;align-items:center;gap:6px;color:var(--text2);font-size:13px;font-weight:700;margin-bottom:16px}
+.sched-nav{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:6px}
+.sched-range{text-align:center;color:var(--accent);font-size:12.5px;margin-bottom:16px}
+.arrowbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border2);background:transparent;color:var(--accent);display:flex;align-items:center;justify-content:center}
+.gridcal{display:grid;grid-template-columns:70px repeat(7,1fr);border-top:1px solid var(--border);border-left:1px solid var(--border)}
+.gridcal .hd{padding:10px 6px;text-align:center;font-size:12px;font-weight:700;color:var(--text2);border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--card2)}
+.gridcal .hourlbl{padding:4px 8px;font-size:11px;color:var(--muted);border-right:1px solid var(--border);border-bottom:1px solid var(--border);height:50px}
+.gridcal .cell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);height:50px;position:relative}
+.evt{position:absolute;inset:2px;border-radius:8px;padding:5px 7px;font-size:10px;font-weight:700;line-height:1.25;overflow:hidden;cursor:pointer}
+.evt.avail{background:rgba(52,211,153,.18);color:#7FE8BE;border:1px solid rgba(52,211,153,.35);cursor:default}
+.evt.pl{background:rgba(52,211,211,.85);color:#04302e}
+.evt.pl:hover{background:#3ad9d4}
+.evt.pl2{background:rgba(52,211,211,.55);color:#04302e;left:52%}
+.modal-back{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:26px;width:min(420px,94vw)}
+.modal-box h3{font-size:16px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal-grouplist{list-style:none;margin:2px 0 18px;padding-left:0}
+.modal-grouplist li{padding:8px 0 8px 26px;font-size:13.5px;color:var(--text2);border-bottom:1px solid var(--border)}
+.modal-grouplist li:last-child{border-bottom:none}
+.modal-actions{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2C2846;border:1px solid var(--accent);color:var(--text);padding:12px 20px;border-radius:10px;font-size:13.5px;z-index:1000;box-shadow:0 8px 26px rgba(0,0,0,.4);max-width:460px;text-align:center}
+.reflect{background:var(--accent-bg);border:1px solid rgba(123,135,245,.35);border-radius:12px;padding:16px 18px;margin-top:16px;font-size:13.5px;color:#D6DCFC;line-height:1.6}
+/* TOUR */
+.tour-card{position:fixed;bottom:20px;right:20px;width:min(360px,90vw);background:#221F3A;border:2px solid #FFD166;border-radius:16px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.5);z-index:999;display:flex;flex-direction:column;gap:9px;max-height:70vh;overflow-y:auto}
+.tour-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tour-step{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#FFD166}
+.tour-x{background:var(--card2);border:none;color:var(--text2);font-size:11px;font-weight:800;padding:5px 11px;border-radius:999px;white-space:nowrap}
+.tour-x:hover{background:var(--card3);color:#fff}
+.tour-title{font-size:15px;font-weight:800}
+.tour-body{font-size:13px;color:var(--text2);line-height:1.55}
+.tour-body b{color:#FFD166}
+.tour-progress{height:5px;background:var(--card2);border-radius:999px;overflow:hidden}
+.tour-progress i{display:block;height:100%;background:#FFD166;border-radius:999px;transition:width .3s}
+.tour-actions{display:flex;justify-content:flex-end;align-items:center;margin-top:2px}
+.tour-next{background:#FFD166;color:#2a2205;border:none;border-radius:8px;padding:9px 18px;font-weight:800;font-size:13px}
+/* LESSON VIEWER */
+.lesson-shell{background:#2A2C3D;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.lesson-top{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:#31344A;border-bottom:1px solid var(--border2)}
+.lesson-brand{font-weight:800;font-size:16px;display:flex;align-items:center;gap:14px;color:#fff}
+.lesson-crumb{color:var(--muted);font-size:13px}
+.lesson-top-right{display:flex;align-items:center;gap:12px}
+.lesson-lang{border:1px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--text2)}
+.lesson-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px}
+.lesson-body{display:flex}
+.lesson-rail{width:52px;background:#25273A;border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding-top:16px}
+.lesson-rail .dot{width:34px;height:34px;border-radius:10px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center}
+.lesson-content{flex:1;padding:28px 30px 20px;max-height:600px;overflow-y:auto}
+.studentblock{background:#31344A;border-radius:12px;padding:24px 26px;margin-bottom:16px}
+.studentblock h2{font-size:21px;font-weight:800;color:#fff;margin-bottom:12px}
+.studentblock p.lead{color:var(--text2);line-height:1.65;margin-bottom:18px}
+.studentblock h4{font-size:14.5px;font-weight:800;color:#fff;margin:16px 0 8px}
+.studentblock ul{margin:0 0 8px 20px;color:var(--text2);line-height:1.7}
+.tipbox{background:#2B3350;border-left:3px solid var(--accent);border-radius:8px;padding:14px 16px;margin-top:16px}
+.tipbox .lbl{color:#AEB8FA;font-weight:800;font-size:11.5px;letter-spacing:.05em;margin-bottom:4px}
+.tipbox p{color:var(--text2);font-size:13.5px;line-height:1.6}
+.notecard{background:#2E2A22;border:1.5px dashed var(--orange);border-radius:12px;padding:20px 22px;margin-bottom:16px}
+.notecard .notelbl{color:var(--orange);font-weight:800;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.notecard h2{font-size:22px;font-weight:800;color:#fff;margin-bottom:16px;line-height:1.3}
+.notecard h3{font-size:15px;font-weight:800;color:#fff;margin:18px 0 8px}
+.notecard p{color:var(--text2);line-height:1.65;margin-bottom:6px;font-size:14px}
+.notecard ul{margin:6px 0 6px 20px;color:var(--text2);line-height:1.65;font-size:14px}
+.notecard b{color:#fff}
+.note-callout{background:#333654;border-left:3px solid var(--accent);border-radius:8px;padding:12px 16px;margin:14px 0;font-size:13.5px}
+.note-callout .lbl{color:#AEB8FA;font-weight:800;font-size:11.5px;letter-spacing:.05em;margin-bottom:4px}
+.videobox{background:linear-gradient(135deg,#dfe6f5,#c3d0ef);border-radius:10px;padding:22px;margin:14px 0;color:#20233a}
+.videobox .tag{background:#e2e7fb;display:inline-block;padding:2px 10px;border-radius:6px;font-size:11px;font-weight:800;margin-bottom:10px}
+.videobox h4{font-size:19px;font-weight:800;margin-bottom:8px}
+.videobox p{font-size:12.5px;color:#454866}
+.lesson-foot{display:flex;align-items:center;justify-content:center;gap:14px;padding:10px;background:#25273A;border-top:1px solid var(--border);color:var(--muted);font-size:13px}
+@media(max-width:760px){.gridcal{font-size:11px}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-logo">K</div>
+    <button class="side-icon" data-page="profile" onclick="goPage('profile')"></button>
+    <button class="side-icon" data-page="courses" onclick="goPage('courses')"></button>
+    <button class="side-icon" data-page="groups" onclick="goPage('groups')"></button>
+    <div class="side-bottom">
+      <button class="side-icon"></button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="sim-badge" id="simBadge"></span>
+      <div class="topbar-right">
+        <button class="tourbtn" id="tourBtnTop" onclick="startTour()"></button>
+        <div class="langwrap">
+          <button class="ticon" id="langBtn" onclick="toggleLangMenu()">文A</button>
+          <div class="langmenu" id="langMenu">
+            <button onclick="setLang('en')" data-lang="en">English</button>
+          </div>
+        </div>
+        <button class="ticon" id="darkIcon"></button>
+        <button class="ticon" id="logoutIcon" onclick="location.reload()"></button>
+      </div>
+    </header>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+
+<div class="modal-back" id="consoleModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">🕐 DEMO_PARALLEL_POLAND</h3>
+    <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px" id="modalGroupsLbl"></div>
+    <ul class="modal-grouplist">
+      <li>DEMO_PARALLEL_POL_G1</li>
+      <li>DEMO_PARALLEL_POL_G2</li>
+      <li>DEMO_PARALLEL_POL_G3</li>
+      <li>DEMO_PARALLEL_POL_G4</li>
+    </ul>
+    <div class="modal-actions">
+      <a onclick="closeConsoleModal()" id="modalExit"></a>
+      <button class="btn btn-accent" id="consoleModalOpenBtn" onclick="openConsoleFromModal()"></button>
+    </div>
+  </div>
+</div>
+
+<div class="tour-card" id="tourCard" style="display:none">
+  <div class="tour-top">
+    <span class="tour-step" id="tourStepLbl"></span>
+    <button class="tour-x" id="tourMinBtn" onclick="minimizeTour()"></button>
+  </div>
+  <div class="tour-progress"><i id="tourBar" style="width:3%"></i></div>
+  <div class="tour-title" id="tourTitle"></div>
+  <div class="tour-body" id="tourBody"></div>
+  <div class="tour-actions">
+    <button class="tour-next" id="tourNextBtn" onclick="nextStep()"></button>
+  </div>
+</div>
+<button id="tourReopenBtn" onclick="reopenTour()" style="display:none;position:fixed;bottom:20px;right:20px;background:#FFD166;color:#2a2205;border:none;border-radius:999px;padding:12px 20px;font-weight:800;font-size:13px;z-index:999;box-shadow:0 8px 26px rgba(0,0,0,.4)"></button>
+
+<script>
+/* ---------- ICONS ---------- */
+const ICONS = {
+ person:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/></svg>',
+ users:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.3"/><path d="M2.5 21c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15 15.3c2.7.4 4.8 2.3 5.5 5.7"/></svg>',
+ book:'<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5c2-1 5-1 7 0v14c-2-1-5-1-7 0V5Z"/><path d="M20 5c-2-1-5-1-7 0v14c2-1 5-1 7 0V5Z"/></svg>',
+ monitor:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>',
+ moon:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>',
+ logout:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>',
+ mail:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>',
+ phone:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1.1.4 2.2.7 3.2a2 2 0 0 1-.5 2.1L8 10.5a16 16 0 0 0 6 6l1.5-1.5a2 2 0 0 1 2-.5c1 .3 2.1.6 3.2.7a2 2 0 0 1 1.7 2Z"/></svg>',
+ flag:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4c3-1.5 6-1.5 9 0s6 1.5 9 0v12c-3 1.5-6 1.5-9 0s-6-1.5-9 0Z"/></svg>',
+ clock:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+ back:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+ arrow:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+ pencil:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+ gear:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>',
+};
+document.querySelector('[data-page="profile"]').innerHTML = ICONS.person;
+document.querySelector('[data-page="courses"]').innerHTML = ICONS.book;
+document.querySelector('[data-page="groups"]').innerHTML = ICONS.users;
+document.getElementById('langBtn').innerHTML = '文A';
+document.getElementById('darkIcon').innerHTML = ICONS.moon;
+document.getElementById('logoutIcon').innerHTML = ICONS.logout;
+document.querySelector('.side-bottom .side-icon').innerHTML = ICONS.person;
+
+/* ---------- I18N STRINGS (all text lives in assets/content-xx.js) ---------- */
+const STR = Object.assign({}, CONTENT.ui, CONTENT.lesson, {steps: CONTENT.steps});
+document.documentElement.lang = CONTENT.lang;
+document.title = CONTENT.ui.pageTitle;
+function T(key){ return STR[key]; }
+function Tf(key,vars){ let s=STR[key]; if(vars) Object.keys(vars).forEach(k=>{ s=s.split('{'+k+'}').join(vars[k]); }); return s; }
+
+/* ---------- FICTIONAL DEMO DATA (language-independent identifiers) ---------- */
+const SUBGROUPS = [
+ {title:'DEMO_PARALLEL_POL_G1',time:'13.08, 17:00–18:00'},
+ {title:'DEMO_PARALLEL_POL_G3',time:'13.08, 17:00–18:00'},
+ {title:'DEMO_PARALLEL_POL_G4',time:'13.08, 17:00–18:00'},
+ {title:'DEMO_PARALLEL_POL_G2',time:'13.08, 17:10–18:10'},
+];
+const COURSE_NAME = '[2063] Code & Game. Level 1[2026][8-9][60 min][40 L][ENG][in progress]';
+
+/* ---------- STATE ---------- */
+let state = {page:'courses', groupsView:'initial', ptab:'groups', ctab:'lessons'};
+
+function goPage(p){ state.page=p; render(); fire('go-'+p); }
+function toggleGroupsView(){
+  state.groupsView = (state.groupsView==='initial') ? 'parallel' : 'initial';
+  render();
+  fire(state.groupsView==='parallel' ? 'click-parallel-tab' : 'click-regular-tab');
+}
+function openGroupDetail(){ state.page='groupDetail'; render(); fire('open-group-detail'); }
+function goPTab(t){ state.ptab=t; render(); fire(t==='schedule'?'open-schedule-tab':'open-groups-tab'); }
+function goCTab(t){ state.ctab=t; render(); fire(t==='assignments'?'open-assignments-tab':'open-lessons-tab'); }
+function openCourseDetail(){ state.page='courseDetail'; state.ctab='lessons'; render(); fire('open-course-detail'); }
+function openLessonViewer(){ state.page='lesson'; render(); fire('open-lesson-viewer'); }
+
+function openConsoleFromDetail(){
+  toast(T('toastConsoleDetail'));
+  fire('open-console-detail');
+}
+function openConsoleModalFromSchedule(){
+  document.getElementById('consoleModal').style.display='flex';
+  fire('open-console-modal');
+}
+function closeConsoleModal(){ document.getElementById('consoleModal').style.display='none'; }
+function openConsoleFromModal(){
+  toast(T('toastConsoleModal'));
+  closeConsoleModal();
+  fire('open-console-modal-btn');
+}
+function simClick(label){ toast(Tf('toastSimClick',{label:label})); }
+function toast(msg){
+  const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),3800);
+}
+
+/* ---------- LANGUAGE ---------- */
+function toggleLangMenu(){ document.getElementById('langMenu').classList.toggle('open'); }
+// Switching language reloads the page with ?lang=xx so the matching content file is loaded
+function setLang(lang){
+  document.getElementById('langMenu').classList.remove('open');
+  if(lang===LANG) return;
+  location.search = lang==='en' ? '' : '?lang=' + lang;
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.langwrap')) document.getElementById('langMenu').classList.remove('open');
+});
+function applyChrome(){
+  document.getElementById('simBadge').textContent = T('simBadge');
+  document.getElementById('tourBtnTop').textContent = T('tourBtn');
+  document.getElementById('tourMinBtn').textContent = T('tourMinimize');
+  document.getElementById('tourReopenBtn').textContent = T('tourResume');
+  document.getElementById('modalGroupsLbl').textContent = T('modalGroups');
+  document.getElementById('modalExit').textContent = T('modalExit');
+  document.getElementById('consoleModalOpenBtn').textContent = T('modalOpenConsole');
+  document.querySelectorAll('.langmenu button').forEach(b=>b.classList.toggle('active', b.dataset.lang===LANG));
+}
+
+/* ---------- RENDER ---------- */
+function render(){
+  const c = document.getElementById('content');
+  document.querySelectorAll('.side-icon[data-page]').forEach(b=>b.classList.toggle('active',
+    b.dataset.page===state.page ||
+    (state.page==='groupDetail' && b.dataset.page==='groups') ||
+    (state.page==='courseDetail' && b.dataset.page==='courses') ||
+    (state.page==='lesson' && b.dataset.page==='courses')
+  ));
+  if(state.page==='groups') c.innerHTML = renderGroups();
+  else if(state.page==='groupDetail') c.innerHTML = renderGroupDetail();
+  else if(state.page==='profile') c.innerHTML = renderProfile();
+  else if(state.page==='courses') c.innerHTML = renderCourses();
+  else if(state.page==='courseDetail') c.innerHTML = renderCourseDetail();
+  else if(state.page==='lesson') c.innerHTML = renderLesson();
+  applyTourHighlights();
+}
+
+function renderGroups(){
+  const label = state.groupsView==='initial' ? T('tabParallel') : T('tabRegular');
+  const body = state.groupsView==='initial'
+    ? `<table><thead><tr><th>${T('colID')}</th><th>${T('colTitle')}</th><th>${T('colTutor')}</th><th>${T('colType')}</th></tr></thead>
+       <tbody><tr class="empty-row"><td colspan="4">${T('emptyRegular')}</td></tr></tbody></table>`
+    : `<table><thead><tr><th>${T('colID')}</th><th>${T('colTitle')}</th><th>${T('colTutor')}</th><th>${T('colCurrentCourse')}</th><th>${T('colStart')}</th><th>${T('colStudentsPaid')}</th><th>${T('colPreviousLesson')}</th><th>${T('colNextLesson')}</th><th>${T('colType')}</th><th>${T('colPremium')}</th></tr></thead>
+       <tbody><tr>
+         <td>11</td>
+         <td><a class="tour-container-row" onclick="openGroupDetail()">DEMO_PARALLEL_POLAND</a></td>
+         <td>${T('teacherName')}</td>
+         <td>—</td><td>—</td><td>—</td><td>-</td><td>—</td>
+         <td>${T('containerType')}</td><td>${T('no')}</td>
+       </tr></tbody></table>
+       <div class="tbl-foot">${T('itemsPage100_1')}</div>`;
+  return `
+  <h1 class="pagetitle">${T('groupsTitle')}</h1>
+  <div class="tabrow">
+    <button class="tab ghost">${T('tabExtra')}</button>
+    <button class="tab ${state.groupsView==='parallel'?'active':''}" id="groupsToggleBtn" onclick="toggleGroupsView()">${label}</button>
+  </div>
+  <div class="tablewrap" id="groupsTable">${body}</div>`;
+}
+
+function renderGroupDetail(){
+  return `
+  <a class="backlink" onclick="goPage('groups')">${ICONS.back} ${T('backToGroups')}</a>
+  <div class="detailhead">
+    <div>
+      <h2>DEMO_PARALLEL_POLAND</h2>
+      <div class="field" style="border:none;padding-top:8px">${ICONS.person}${T('tutorLabel')} <a>${T('teacherName')}</a></div>
+    </div>
+    <div class="detailhead-actions">
+      <span class="icontip tour-console-btn" id="openConsoleBtn">
+        <button class="iconbtn" onclick="openConsoleFromDetail()">${ICONS.monitor}</button>
+        <span class="bubble">${T('openConsoleTip')}</span>
+      </span>
+    </div>
+  </div>
+  <div class="tablewrap" id="groupDetailTable">
+    <table><thead><tr><th>${T('colTitle')}</th><th>${T('colLessonTime')}</th><th>${T('colCourse')}</th><th>${T('colNextTopic')}</th></tr></thead>
+    <tbody>${SUBGROUPS.map(g=>`<tr>
+      <td><a>${g.title}</a></td><td>${g.time}</td>
+      <td><a onclick="simClick(T('simOpenCourseFromDetail'))">${COURSE_NAME}</a></td>
+      <td>—</td>
+    </tr>`).join('')}</tbody></table>
+    <div class="tbl-foot">${T('itemsPage10_4')}</div>
+  </div>`;
+}
+
+function renderProfile(){
+  const AVAILABILITY = [
+   [T('days')[0],'14:00-16:00'],[T('days')[1],'16:00-18:00'],[T('days')[2],'13:00-15:00'],
+   [T('days')[3],null],[T('days')[4],null],[T('days')[5],null],[T('days')[6],null]
+  ];
+  return `
+  <h1 class="pagetitle">${T('profileTitle')}</h1>
+  <div class="row3">
+    <div class="card">
+      <div class="profile-name">${T('teacherName')} <span class="pill pill-green">${T('badgeActive')}</span></div>
+      <div class="field">${ICONS.mail}—</div>
+      <div class="field">${ICONS.phone}—</div>
+      <div class="field">${ICONS.flag}${T('teacherCountry')}</div>
+      <div class="field">${ICONS.clock}UTC (UTC+00:00)</div>
+    </div>
+    <div class="card">
+      <h3>${T('teacherCoursesH')}</h3>
+      <div class="course-item">${COURSE_NAME}</div>
+    </div>
+    <div class="card">
+      <h3>${T('availabilityH')} ${ICONS.pencil}</h3>
+      ${AVAILABILITY.map(([d,v])=>`<div class="availrow"><span class="day">${d}:</span><span class="val ${v?'set':''}">${v||T('notAssigned')}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="tabrow">
+    <button class="tab ${state.ptab==='groups'?'active':''}" data-ptab="groups" onclick="goPTab('groups')">${ICONS.users} ${T('groupsTabLbl')}</button>
+    <button class="tab ${state.ptab==='schedule'?'active':''}" data-ptab="schedule" onclick="goPTab('schedule')">${ICONS.clock} ${T('scheduleTabLbl')}</button>
+  </div>
+  ${state.ptab==='schedule' ? renderSchedule() : `<div class="tablewrap"><div class="empty-row" style="padding:26px;text-align:center;color:var(--muted);font-style:italic">${T('regularGroupsNote')}</div></div>`}
+  `;
+}
+
+function renderSchedule(){
+  const days = T('days');
+  const hours=['01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM','06:00 PM','07:00 PM','08:00 PM'];
+  return `
+  <div class="sched-nav"><button class="arrowbtn">${ICONS.back}</button><button class="btn btn-ghost">${T('currentWeek')}</button><button class="arrowbtn">${ICONS.arrow}</button></div>
+  <div class="sched-range">10.08 - 16.08.2026 📅</div>
+  <div class="tablewrap" style="padding-bottom:6px" id="scheduleGrid">
+    <div class="gridcal">
+      <div class="hd"></div>${days.map(d=>`<div class="hd">${d}</div>`).join('')}
+      ${hours.map((h,i)=>`<div class="hourlbl">${h}</div>${days.map((d,di)=>{
+        let content='';
+        if(di===0&&i===0) content=`<div class="evt avail">14:00-16:00<br>${T('available')}</div>`;
+        if(di===1&&i===2) content=`<div class="evt avail">16:00-18:00<br>${T('available')}</div>`;
+        if(di===2&&i===0) content=`<div class="evt avail">13:00-15:00<br>${T('available')}</div>`;
+        if(di===3&&i===4) content=`<div class="evt pl" onclick="openConsoleModalFromSchedule()">17:00-18:00<br>DEMO_PARALLEL_POLAND</div><div class="evt pl2" onclick="openConsoleModalFromSchedule()">17:10-18:10</div>`;
+        return `<div class="cell">${content}</div>`;
+      }).join('')}`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderCourses(){
+  return `
+  <h1 class="pagetitle">${T('coursesTitle')}</h1>
+  <div class="tablewrap">
+    <table><thead><tr><th>${T('colID')}</th><th>${T('colTitle')}</th><th>${T('colBusinessBranch')}</th><th>${T('colActive')}</th><th>${T('colNumberOfLessons')}</th></tr></thead>
+    <tbody><tr>
+      <td>2063</td>
+      <td><a class="tour-course-link" onclick="openCourseDetail()">${COURSE_NAME}</a></td>
+      <td>ENG</td><td>${T('yes')}</td><td>40</td>
+    </tr></tbody></table>
+    <div class="tbl-foot">${T('itemsPage100_1')}</div>
+  </div>`;
+}
+
+function renderCourseDetail(){
+  return `
+  <a class="backlink" onclick="goPage('courses')">${ICONS.back} ${T('backToCourses')}</a>
+  <div class="course-head-card card" style="margin-bottom:18px">
+    <h1 class="pagetitle" style="margin-bottom:10px">${COURSE_NAME}</h1>
+    <div style="display:flex;gap:10px;margin-bottom:14px"><span class="pill pill-green">${T('badgeActive')}</span><span class="pill" style="background:#4a3420;color:#e0a860">fwd</span></div>
+    <div class="row3" style="grid-template-columns:1fr 1fr">
+      <div>
+        <div class="field">${ICONS.users}${T('fieldBranch')}</div>
+        <div class="field">文A ${T('fieldLanguage')}</div>
+        <div class="field">${ICONS.clock}${T('fieldCourseType')}</div>
+        <div class="field">${ICONS.users}${T('fieldCourseGroup')}</div>
+      </div>
+      <div>
+        <div class="field">${T('fieldLessons')}</div>
+        <div class="field">${T('fieldModules')}</div>
+        <div class="field">${T('fieldExcluded')}</div>
+        <div class="field">${T('fieldCertificate')}</div>
+      </div>
+    </div>
+  </div>
+  <div class="tabrow">
+    <button class="tab ${state.ctab==='lessons'?'active':''}" data-ctab="lessons" onclick="goCTab('lessons')">${T('lessonsTab')}</button>
+    <button class="tab ${state.ctab==='assignments'?'active':''}" data-ctab="assignments" onclick="goCTab('assignments')">${T('assignmentsTab')}</button>
+  </div>
+  ${state.ctab==='assignments' ? renderAssignments() : renderLessonsTab()}
+  `;
+}
+
+function renderLessonsTab(){
+  return `
+  <div class="tablewrap">
+    <table><thead><tr><th>${T('colID')}</th><th>${T('colTitle')}</th><th>${T('colNo')}</th><th>${T('colActions')}</th></tr></thead>
+    <tbody><tr><td>9001</td><td>${T('moduleFirstSteps')}</td><td>1</td><td><a onclick="goCTab('assignments')">${T('viewAssignments')}</a></td></tr></tbody></table>
+  </div>`;
+}
+
+function assignRows(titles, meta){
+  return meta.map((r,i)=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[0]===1?`<a class="tour-lesson-link" onclick="openLessonViewer()">${titles[i]}</a>`:`<a onclick="openLessonViewer()">${titles[i]}</a>`}</td><td>${T('interactive')}</td>
+    <td>${r[2]?'✅':'❌'}</td><td>${r[3]?'✅':'❌'}</td><td>${r[4]}</td></tr>`).join('');
+}
+const IN_CLASS_META = [
+ [1,206311,true,false,5],[2,206312,true,false,5],[3,206313,true,false,5],[4,206314,false,false,5],
+ [5,206315,false,false,5],[6,206316,false,false,5],[7,206317,true,false,10],[8,206318,false,false,5],
+ [9,206319,false,false,5]
+];
+const HOMEWORK_META = [];
+
+function renderAssignments(){
+  return `
+  <div style="margin-bottom:14px">
+    <label style="font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:6px">${T('lessonSelectLbl')}</label>
+    <select class="tab" style="width:100%;max-width:360px;text-align:left"><option>${T('lessonOption')}</option></select>
+  </div>
+  <div class="tablewrap" id="inClassTable" style="margin-bottom:18px">
+    <h3 style="padding:16px 18px 0">${T('inClassH')}</h3>
+    <table><thead><tr><th>${T('colNumber')}</th><th>${T('colID')}</th><th>${T('colAssignmentTitle')}</th><th>${T('colType')}</th><th>${T('colTheory')}</th><th>${T('colProject')}</th><th>${T('colMaxScore')}</th></tr></thead>
+    <tbody>${assignRows(T('inClass'),IN_CLASS_META)}</tbody></table>
+    <div class="tbl-foot">${T('itemsPage100_19')}</div>
+  </div>
+  <div class="tablewrap" style="margin-bottom:18px">
+    <h3 style="padding:16px 18px 0">${T('homeworkH')}</h3>
+    <table><thead><tr><th>${T('colNumber')}</th><th>${T('colID')}</th><th>${T('colAssignmentTitle')}</th><th>${T('colType')}</th><th>${T('colTheory')}</th><th>${T('colProject')}</th><th>${T('colMaxScore')}</th></tr></thead>
+    <tbody>${HOMEWORK_META.length ? assignRows(T('homework'),HOMEWORK_META) : `<tr class="empty-row"><td colspan="7">${T('noData')}</td></tr>`}</tbody></table>
+  </div>
+  <div class="tablewrap" id="studyGuidesTable">
+    <h3 style="padding:16px 18px 0">${T('studyGuidesH')}</h3>
+    <table><thead><tr><th>${T('colID')}</th><th>${T('colTitle')}</th></tr></thead>
+    <tbody><tr class="empty-row"><td colspan="2">${T('noData')}</td></tr></tbody></table>
+    <div class="tbl-foot">${T('noWikiNote')}</div>
+  </div>`;
+}
+
+function renderLesson(){
+  const ri = T('resultItems'), ii = T('importantItems'), ei = T('equipItems'), si = T('spaceItems');
+  return `
+  <a class="backlink" onclick="goCTab('assignments')">${ICONS.back} ${T('backToAssignments')}</a>
+  <div class="lesson-shell">
+    <div class="lesson-top">
+      <div class="lesson-brand">kodland <span class="lesson-crumb">${T('lessonCrumb')}</span></div>
+      <div class="lesson-top-right">
+        <div class="lesson-lang">${LANG.toUpperCase()} ▾</div>
+        <div class="lesson-avatar">${ICONS.person}</div>
+      </div>
+    </div>
+    <div class="lesson-body">
+      <div class="lesson-rail"><div class="dot">${ICONS.gear}</div></div>
+      <div class="lesson-content">
+        <div class="notecard" id="lessonNotes">
+          <div class="notelbl">${T('teacherNoteBadge')}</div>
+          <h2>${T('lessonTitle')}</h2>
+          <h3>${T('hOverview')}</h3>
+          <p>${T('pOverview')}</p>
+          <h3>${T('hMission')}</h3>
+          <p>${T('pMission')}</p>
+          <h3>${T('hGoal')}</h3>
+          <p>${T('pGoal')}</p>
+          <h3>${T('hResult')}</h3>
+          <ul>${ri.map(x=>`<li>${x}</li>`).join('')}</ul>
+          <div class="note-callout"><div class="lbl">${T('calloutLbl')}</div>${T('callout')}</div>
+          <div class="videobox"><div class="tag">${T('videoTag')}</div><h4>${T('videoTitle')}</h4><p>${T('videoDesc')}</p></div>
+          <h3>${T('hRole')}</h3>
+          <p>${T('pRole1')}</p>
+          <p>${T('pRole2')}</p>
+          <h3>${T('hFocus')}</h3>
+          <p>${T('pFocus1')}</p>
+          <p>${T('pFocus2')}</p>
+          <p>${T('pFocus3')}</p>
+          <h3>${T('hImportant')}</h3>
+          <ul>${ii.map(x=>`<li>${x}</li>`).join('')}</ul>
+          <h3>${T('hEnding')}</h3>
+          <p>${T('pEnding')}</p>
+          <h3>${T('hNext')}</h3>
+          <p>${T('pNext')}</p>
+        </div>
+        <div class="studentblock" id="lessonStudent">
+          <h2>${T('studentTitle')}</h2>
+          <p class="lead">${T('studentLead')}</p>
+          <h4>${T('hEquip')}</h4>
+          <ul>${ei.map(x=>`<li>${x}</li>`).join('')}</ul>
+          <h4>${T('hSpace')}</h4>
+          <ul>${si.map(x=>`<li>${x}</li>`).join('')}</ul>
+          <div class="tipbox"><div class="lbl">${T('tipLbl')}</div><p>${T('tipBody')}</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="lesson-foot">◀ &nbsp; 1 / 9 &nbsp; ▶</div>
+  </div>`;
+}
+
+/* ---------- GUIDED TOUR (structure is language-independent; text comes from T('steps')) ---------- */
+const STEPS = [
+ {page:'courses',sel:'.tour-course-link',hl:['.tour-course-link'],advance:'coursedetail',waitFor:'open-course-detail'},
+ {page:'courseDetail',ctab:'lessons',sel:'.course-head-card',advance:'next'},
+ {page:'courseDetail',ctab:'lessons',sel:'[data-ctab="assignments"]',hl:['[data-ctab="assignments"]'],advance:'assignments',waitFor:'open-assignments-tab'},
+ {page:'courseDetail',ctab:'assignments',sel:'#inClassTable',advance:'next'},
+ {page:'courseDetail',ctab:'assignments',sel:'#studyGuidesTable',advance:'next'},
+ {page:'courseDetail',ctab:'assignments',sel:'.tour-lesson-link',hl:['.tour-lesson-link'],advance:'lesson',waitFor:'open-lesson-viewer'},
+ {page:'lesson',sel:'#lessonNotes',advance:'next'},
+ {page:'lesson',sel:'#lessonStudent',advance:'next'},
+];
+let stepIdx = -1;
+
+function startTour(){
+  stepIdx = 0;
+  goToStepPage();
+  showStepCard();
+}
+function goToStepPage(){
+  const st = STEPS[stepIdx];
+  const needsModalOpen = st.sel && st.sel.indexOf('consoleModal')!==-1;
+  if(!needsModalOpen) closeConsoleModal();
+  state.page = st.page;
+  if(st.groupsView) state.groupsView = st.groupsView;
+  if(st.ptab) state.ptab = st.ptab;
+  if(st.ctab) state.ctab = st.ctab;
+  render();
+  if(needsModalOpen) document.getElementById('consoleModal').style.display='flex';
+}
+function showStepCard(){
+  const st = STEPS[stepIdx];
+  const txt = T('steps')[stepIdx];
+  document.getElementById('tourCard').style.display='flex';
+  document.getElementById('tourReopenBtn').style.display='none';
+  document.getElementById('tourStepLbl').textContent = Tf('stepOf',{n:stepIdx+1,total:STEPS.length});
+  document.getElementById('tourBar').style.width = Math.round(((stepIdx+1)/STEPS.length)*100)+'%';
+  document.getElementById('tourTitle').innerHTML = txt.title;
+  document.getElementById('tourBody').innerHTML = txt.body;
+  const nb = document.getElementById('tourNextBtn');
+  if(st.advance==='next'){ nb.style.display='inline-block'; nb.textContent = (stepIdx===STEPS.length-1) ? T('finish') : T('nextArrow'); }
+  else { nb.style.display='none'; }
+}
+function nextStep(){
+  stepIdx++;
+  if(stepIdx>=STEPS.length){ endTour(); return; }
+  goToStepPage();
+  showStepCard();
+}
+function minimizeTour(){
+  document.getElementById('tourCard').style.display='none';
+  document.getElementById('tourReopenBtn').style.display='block';
+}
+function reopenTour(){
+  document.getElementById('tourReopenBtn').style.display='none';
+  document.getElementById('tourCard').style.display='flex';
+}
+function endTour(){
+  document.getElementById('tourCard').style.display='none';
+  document.getElementById('tourReopenBtn').style.display='none';
+  document.querySelectorAll('.tour-hl').forEach(e=>e.classList.remove('tour-hl'));
+  const c = document.getElementById('content');
+  c.insertAdjacentHTML('afterbegin', `<div class="reflect" style="margin-bottom:18px">${T('reflect')}</div>`);
+  showSimDone();
+}
+// Clear end of the simulation: tells the tutor it's finished and to go back to the training
+// New completion code every time the simulation is completed (PREFIX-NNNN-CC). The training validates CC from NNNN — keep p/k/s in sync with CONFIG.CODE_RULES in index.html.
+function completionCode(){ const n = 1000 + Math.floor(Math.random() * 9000); return 'BO-' + n + '-' + ((n * 7 + 13) % 89 + 10); }
+// Math 5–7 training copy: tell the training that embeds this page (course-engine flag 'boSim') that the simulation is complete
+function notifyDone(){ const msg = { type:'em-sim-done', sim:'boSim' }; try{ parent.postMessage(msg, '*'); }catch(e){} try{ if (window.opener) window.opener.postMessage(msg, '*'); }catch(e){} }
+function showSimDone(){
+  notifyDone();
+  if (document.getElementById('simDone')) return;
+  const o = document.createElement('div');
+  o.id = 'simDone';
+  o.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,12,22,.72);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Inter,system-ui,sans-serif';
+  o.innerHTML = '<div style="background:#fff;color:#1f2433;max-width:520px;width:100%;border-radius:22px;padding:30px 30px 24px;text-align:center;border-top:8px solid #2fbf68;box-shadow:0 30px 80px rgba(0,0,0,.45)">'
+    + '<div style="font-size:54px;line-height:1">🎉</div>'
+    + '<h2 style="margin:12px 0 8px;font-size:24px">' + CONTENT.done.title + '</h2>'
+    + '<p style="color:#454b5e;font-size:15px;line-height:1.6;margin:6px 0">' + CONTENT.done.body + '</p>'
+    + '<p style="color:#1f2433;font-size:15px;line-height:1.6;margin:14px 0 0;background:#fff4c7;border-radius:12px;padding:12px 14px">' + CONTENT.done.nextStep + '</p>'
+    + '<div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap">'
+    + '<button id="simDoneStay" style="border:1px solid #c9cdd8;background:#fff;border-radius:10px;padding:11px 18px;font-weight:600;font-size:14px;cursor:pointer">' + CONTENT.done.stay + '</button>'
+    + '<button id="simDoneClose" style="border:0;background:#1f2433;color:#fff;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14px;cursor:pointer">' + CONTENT.done.close + '</button>'
+    + '</div></div>';
+  document.body.appendChild(o);
+  document.getElementById('simDoneStay').onclick = () => o.remove();
+  // window.close() only works for tabs opened by the training; otherwise explain what to do
+  document.getElementById('simDoneClose').onclick = () => {
+    window.close();
+    setTimeout(() => { o.querySelector('p:last-of-type').innerHTML = CONTENT.done.closedMsg; }, 300);
+  };
+}
+function tourActive(){ return stepIdx>=0 && stepIdx<STEPS.length; }
+document.addEventListener('click', function(e){
+  if(!tourActive()) return;
+  if(e.target.closest('.tour-card, #tourReopenBtn, .tour-hl, .langwrap')) return;
+  e.preventDefault();
+  e.stopPropagation();
+  toast(T('toastBlocked'));
+}, true);
+function fire(action){
+  if(stepIdx<0 || stepIdx>=STEPS.length) return;
+  if(STEPS[stepIdx].waitFor===action){
+    setTimeout(()=>{
+      stepIdx++;
+      if(stepIdx>=STEPS.length){ endTour(); } else { goToStepPage(); showStepCard(); }
+    }, 300);
+  }
+}
+function applyTourHighlights(){
+  document.querySelectorAll('.tour-hl').forEach(e=>e.classList.remove('tour-hl'));
+  if(stepIdx<0 || stepIdx>=STEPS.length) return;
+  const st = STEPS[stepIdx];
+  const targets = st.hl || [st.sel];
+  targets.forEach(sel=>{
+    if(!sel) return;
+    document.querySelectorAll(sel).forEach(el=>el.classList.add('tour-hl'));
+  });
+  if(st.sel){ const el=document.querySelector(st.sel); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+
+applyChrome();
+render();
+startTour();
+</script>
+</body>
+</html>
